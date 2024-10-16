@@ -46,3 +46,4 @@ void lcdprint(unsigned char *msg)  //function to send string data to lcd
 }
 
 #endif
+Author: Yennam Sai Tharun Reddy

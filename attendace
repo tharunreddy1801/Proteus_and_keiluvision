@@ -1,0 +1,64 @@
+#include <at89x52.h>
+#include <stdio.h>
+#include <lcd.h>
+
+// LCD Pins
+#define LCD P2
+unsigned int count = 0;  // Attendance count
+unsigned int i;
+unsigned int seconds = 0;
+sbit Push_button = P1^7;
+sbit switch1 = P1^0;
+
+void delay_1sec(unsigned int itime1) {  // Function to create a delay of approximately 1 second
+    unsigned int i,j;
+	  for(i=0;i<itime1;i++)
+    for (j = 0; j < 1000; j++);
+}
+
+void main() {
+    lcd_init8bit();  // Initialize the LCD
+        if (switch1 == 1) {  // If the switch is off
+            lcdcmd(0x01);    // Clear LCD
+            lcdcmd(0x80);    // Go to the first line of the LCD
+            lcdprint("System Off");
+            delay(20);
+        } else {  // If the switch is on
+            lcdcmd(0x01);    // Clear LCD
+            lcdcmd(0x80);    // Go to the first line of the LCD
+            lcdprint("System Active");
+            delay(20);
+            count = 0;       // Reset attendance count
+
+            while(seconds < 300) {  // Loop for 5 minutes (300 seconds)
+                if (Push_button == 0) {  // Button press detected
+                    delay(20);  // Simple debounce delay
+
+                    if (Push_button == 0) {  // Confirm button press
+                        while (Push_button == 0);  // Wait for button release
+                        count++;  // Increment count on release
+
+                        lcdcmd(0xC0);  // Go to the second line of the LCD
+                        lcdprint("Count: ");
+                        lcddata(count + '0');  // Display the count
+                    }
+                }
+
+                delay_1sec(5);  // 1 second delay
+                seconds++;  // Increment the time count
+
+                // Check if switch has been turned off during operation
+                if (switch1 == 1) {
+                    break;  // Exit to display "System Off" if switch is turned off
+                }
+            }
+
+            // After 5 minutes, exit counting and display "Time Over"
+            lcdcmd(0x01);  // Clear LCD
+            lcdcmd(0x80);  // Go to the first line of the LCD
+            lcdprint("Time Over");
+            delay(2);
+        }
+    
+}
+Author: Yennam Sai tharun reddy

@@ -1,0 +1,49 @@
+#ifndef LCD_H
+#define LCD_H
+sfr ldata=0xa0;
+
+sbit rs=P3^7;
+sbit rw=P3^6;
+sbit en=P3^5;
+void delay(unsigned int itime)
+{
+ unsigned int i,j;
+ for(i=0;i<itime;i++)
+ for(j=0;j<1275;j++);
+}
+void lcdcmd(unsigned char value)
+{
+ldata=value;
+rs=0;
+rw=0;
+en=1;
+delay(1);
+en=0;
+}
+void lcddata(unsigned char value)
+{
+ldata=value;
+rs=1;
+rw=0;
+en=1;
+delay(1);
+en=0;
+}
+void lcd_init8bit()
+{
+lcdcmd(0x38); //funtion set 8bit mode 2 line and 5x7
+lcdcmd(0x0e); //display on and cursor on
+lcdcmd(0x01); //clear display screen
+lcdcmd(0x06); //entry mode( shift cursor to right)
+}
+void lcdprint(unsigned char *msg)  //function to send string data to lcd
+{
+   while(*msg)
+   {
+      lcddata(*msg);
+	  msg++;
+   }
+}
+
+#endif
+Author:Yennam Sai tharun Reddy
